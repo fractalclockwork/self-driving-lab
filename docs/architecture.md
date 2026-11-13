@@ -35,13 +35,15 @@ Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestr
 
 | Layer | Owns | Does not own |
 | --- | --- | --- |
-| **self-driving-lab** | SOPs, policy, campaign state, HTTP adapters | Wire protocols, G-code, V4L capture, MCU flash |
-| **Instrument repos** | IOP, abort / idle-safe, acquisition | Campaign policy; gateway OS / by-id contracts |
+| **self-driving-lab** | SOPs, policy, campaign chemistry (e.g. tap vs distilled), `runs/` provenance, HTTP adapters | Wire protocols, G-code, V4L capture, MCU flash; instrument-repo source edits |
+| **Instrument repos** | IOP, abort / idle-safe, acquisition, published instrument baselines | Campaign policy; gateway OS / by-id contracts; SDL store |
 | **CEDE** | Toolchains, flash/sync, by-id serial & UVC nodes, access groups (`dialout` / `video`) | Spectrometer protocol, Marlin G-code, campaign policy |
+
+**Reuse without merging:** spectrometer-lab (and later instrument repos) are **standalone black-box services**. SDL consumes their published contract — preferred: HTTP (`LS55HttpClient` → `:8055`); temporary until Stage 3 SOP/HTTP is live: invoke sibling-checkout CLIs via `SPECTROMETER_LAB_ROOT` the same way HIL does. Do **not** patch instrument repos from an SDL session, vendor `ls55` into this tree, or write campaign chemistry into instrument published calibration sets. Sample identity and accept/reject live in SDL campaign state / `runs/`.
 
 **Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; bringup [water Raman](use_cases/water_raman.md), later [tonic dilution / IFE](use_cases/tonic_dilution.md)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](use_cases/prep_area_dimensional.md); ChArUco + Dev-Host vision — [bring-up](roadmap/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco is SDL on the Dev-Host after capture.
 
-**Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md).
+**Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md). **Stretch:** [`tools/lab_status.py`](../tools/lab_status.py) emits attach-vs-IOP JSON for the cohort; [crt-drive](https://github.com/fractalclockwork/crt-drive) VTTY (`APP=vtty`, `vtty_host_lab`) can show it on the Link MC5 — display only, not a campaign gate.
 
 ## Loop
 

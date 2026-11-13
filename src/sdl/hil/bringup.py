@@ -176,6 +176,26 @@ def _spectrometer_lab_root(explicit: Optional[Path]) -> Path:
     )
 
 
+def _spectrometer_lab_remote_root(explicit: Optional[Path] = None) -> str:
+    """Path for `cd` on the SSH gateway.
+
+    Prefer an absolute remote path. A leading `~` is rewritten to `$HOME` so
+    `bash -lc` expands the gateway home (not the Dev-Host home).
+    """
+    if explicit is not None:
+        raw = str(explicit)
+    else:
+        raw = os.environ.get("SPECTROMETER_LAB_ROOT", "~/src/spectrometer-lab")
+    if raw.startswith("~/"):
+        return "$HOME/" + raw[2:]
+    if raw == "~":
+        return "$HOME"
+    if raw.startswith("~"):
+        return "$HOME" + raw[1:]
+    return str(Path(raw).expanduser())
+
+
+
 def _run_ls55_identity_local(
     port: str,
     *,
@@ -214,18 +234,25 @@ def _run_ls55_identity_ssh(
     gateway: str,
     port: str,
     *,
-    root: Path,
+    root: Path | str,
     timeout_s: float = 90.0,
 ) -> tuple[int, str, str]:
-    # Expand ~ on the remote via bash -lc; quote paths for the remote shell.
-    remote_root = str(root)
+    # Keep leading ~ so bash -lc expands it on the gateway (not the Dev-Host home).
+    if isinstance(root, Path):
+        remote_root = _spectrometer_lab_remote_root(root)
+    else:
+        remote_root = root if root.startswith("~") else str(Path(root).expanduser())
+    # Absolute uv — login bashrc on the Pi can clobber PATH for `bash -lc`.
+    # Quote the cd target after $HOME expansion with an eval-safe form:
+    #   cd "$HOME/src/spectrometer-lab"
     remote_cmd = (
-        f"cd {shlex.quote(remote_root)} && "
-        f"uv run python scripts/dump_instrument_identity.py "
+        f"cd \"{remote_root}\" && "
+        f"\"$HOME/.local/bin/uv\" run python scripts/dump_instrument_identity.py "
         f"--port {shlex.quote(port)} --gate-a-pass --compartment-closed"
     )
+    # ssh joins argv with spaces; the -lc script must be one remote word.
     proc = subprocess.run(
-        [*_ssh_prefix(gateway), "bash", "-lc", remote_cmd],
+        [*_ssh_prefix(gateway), f"bash -lc {shlex.quote(remote_cmd)}"],
         capture_output=True,
         text=True,
         timeout=timeout_s,
@@ -247,13 +274,14 @@ def check_ls55(
             False,
             "port not found (set LS55_PORT / --ls55-port or attach Prolific by-id)",
         )
-    root = _spectrometer_lab_root(spectrometer_lab_root)
     try:
         if ssh_gateway:
+            remote_root = _spectrometer_lab_remote_root(spectrometer_lab_root)
             code, stdout, stderr = _run_ls55_identity_ssh(
-                ssh_gateway, port, root=root, timeout_s=max(timeout_s, 90.0)
+                ssh_gateway, port, root=remote_root, timeout_s=max(timeout_s, 90.0)
             )
         else:
+            root = _spectrometer_lab_root(spectrometer_lab_root)
             code, stdout, stderr = _run_ls55_identity_local(
                 port, root=root, timeout_s=timeout_s
             )

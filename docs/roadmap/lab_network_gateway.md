@@ -137,14 +137,16 @@ Stage 0-style records gain, alongside USB by-id:
 | 4. IOP probe | Instrument smoke | LS 55 identity; Marlin `M115`; one-frame capture; HTTP `/api/state` |
 | 5. Aggregate | Orchestration gate | `healthy` / `degraded` / `unreachable` / `powered_off` |
 
-Campaigns refuse **live** mode when required devices are not `healthy` (fixture / dry-run unchanged). Cohort HIL ([`instrument_hil_bringup.md`](instrument_hil_bringup.md)) already exercises layer 4 for the first bridge cohort; this proposal adds layers 1–3 and the aggregate gate as Stage 0 inventory requirements—not implemented clients.
+Campaigns refuse **live** mode when required devices are not `healthy` (fixture / dry-run unchanged). Cohort HIL ([`instrument_hil_bringup.md`](instrument_hil_bringup.md)) already exercises layer 4 for the first bridge cohort; this proposal adds layers 1–3 and the aggregate gate as Stage 0 inventory requirements—PDU clients and campaign gates still unimplemented.
+
+**Stretch (display, not campaign gate):** [`tools/lab_status.py`](../../tools/lab_status.py) / `sdl.hil.status` is a Dev-Host read-mostly snapshot of layers 2–4 (gateway SSH, USB/V4L attach, LS 55 identity / Marlin `M115`). It distinguishes LS 55 **ADAPTER** (by-id present, no IOP reply — e.g. instrument powered off) from Marlin **CTRL OK** (Mega answers `M115` even when gantry mains are off; pass `--note` for mains until PDUs exist). [crt-drive](https://github.com/fractalclockwork/crt-drive) `vtty_host_lab` paints a phosphor dashboard (LEDs / clock / rules); local Pico via `make vtty-start HOST=vtty_host_lab`, Pico on cede-pi via `tools/vtty_lab_gateway.sh`. Not layer 1 / not `powered_off` aggregate.
 
 ## SDL implications
 
 - **Stage 0 inventory** cites IP identity, `outlet_id`, and health probe hooks the same way it cites CEDE by-id stubs ([`instrument_bringup.md`](instrument_bringup.md)).
-- **HIL** may later add reachability / outlet-status checks; attach smoke remains CEDE/IOP territory.
+- **HIL** may later add reachability / outlet-status checks; attach smoke remains CEDE/IOP territory. Lab-status + CRT VTTY is a display stretch beside HIL, not a live-mode gate.
 - **Orchestration** gates live campaigns on aggregate health; power actions stay outside the SOP science loop unless an explicit armed recovery step is designed later.
-- Ownership unchanged: CEDE = gateway OS / attach; instrument repos = IOP; SDL = inventory shape, health rollup, gated power ops, science loop. OpenWRT/PDU lab-ops config can live under this proposal until a later CEDE decision.
+- Ownership unchanged: CEDE = gateway OS / attach; instrument repos = IOP; SDL = inventory shape, health rollup, gated power ops, science loop. OpenWRT/PDU lab-ops config can live under this proposal until a later CEDE decision. CRT glass painting stays in crt-drive; SDL owns the status JSON.
 - No ChemOS / AlabOS / IvoryOS, SiLA 2, or OPC UA adoption.
 
 ## Phased proposal (paper only)
@@ -162,13 +164,15 @@ Campaigns refuse **live** mode when required devices are not `healthy` (fixture 
 - Replacing RoboCam GUI; moving campaign vision onto gateways.
 - SiLA 2 / OPC UA; ChemOS-class adoption.
 - CEDE OTA fleet (parked as in CEDE DS-17); changing CEDE Phase 7 DoD.
-- Implementing health rollup or outlet APIs in this repo.
+- PDU outlet APIs or campaign live-mode gates on aggregate health (lab-status / CRT VTTY display stretch is separate).
 
 ## Related docs
 
 - Architecture: [`docs/architecture.md`](../architecture.md)
 - Instrument bringup ladder: [`instrument_bringup.md`](instrument_bringup.md)
 - Stage 0 HIL (LS 55 + Marlin + C310): [`instrument_hil_bringup.md`](instrument_hil_bringup.md)
+- Lab status CLI (layers 2–4 display): [`tools/lab_status.py`](../../tools/lab_status.py)
+- CRT VTTY lab page: [crt-drive `vtty_host_lab.py`](https://github.com/fractalclockwork/crt-drive/blob/main/tools/vtty_host_lab.py)
 - Marlin + C310: [`marlin_c310_bringup.md`](marlin_c310_bringup.md)
 - Continuous instrument peers: [`docs/vendor/continuous_instrument_development.md`](../vendor/continuous_instrument_development.md)
 - CEDE: [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [lab.example.yaml](https://github.com/fractalclockwork/cede/blob/main/config/lab.example.yaml)

@@ -1,18 +1,18 @@
 # Use-case: Water Raman (LS 55 bringup)
 
-Simpler **first LS 55** SDL loop: distilled-water O–H Raman band as wavelength / SNR bringup. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md).
+Simpler **first LS 55** SDL loop: water O–H Raman band as wavelength / SNR bringup. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md) (standalone IOP — SDL does not edit that repo). Distilled series `20261103-1629` is the wavelength / fixture reference; the first live SDL comparison series uses **tap water** and is recorded under [`runs/tap_water_raman_20261113-214920/`](../../runs/tap_water_raman_20261113-214920/REPORT.md) (not in spectrometer-lab `data/published/water-raman/`). That series **stopped at sanity** (no local max within 5 nm of 397 nm; continuum-dominated).
 
 [Tonic dilution / IFE](tonic_dilution.md) is a **later Stage 4** project (adaptive dilution ladder). This use-case targets **Stage 3** (operator-gated connect → setup → scan → accept) with a thin accept/reject rule — not a multi-dilution policy.
 
 ## Science / engineering question
 
-With Ex **350 nm** and Em **380–420 nm** (`10 nm` slits), does blank-subtracted distilled water show a local max near the **397 nm** guide (|Δ| ≤ 5 nm) with finite RMS SNR and no clip/overload — enough to trust lamp, monochromators, and PMT on this fixture?
+With Ex **350 nm** and Em **380–420 nm** (`10 nm` slits), does blank-subtracted water show a local max near the **397 nm** guide (|Δ| ≤ 5 nm) with finite RMS SNR and no clip/overload — enough to trust lamp, monochromators, and PMT on this fixture? Tap vs distilled intensity/SNR differences are chemistry comparison, not a seating or calibration update.
 
 ## Hardware / chemistry
 
-- Instrument: PerkinElmer LS 55 via spectrometer-lab
+- Instrument: PerkinElmer LS 55 via spectrometer-lab IOP (HTTP preferred; CLI invoke temporary until `WaterRamanSOP` lands)
 - Physical attach (Pi bench): LS 55 RS-232 via **cede-gateway** Prolific USB–RS232 by-id (CEDE Phase 7)
-- Sample: distilled water in 4-window UV quartz cuvette
+- Sample (first live SDL series): **tap water** in 4-window UV quartz cuvette; distilled remains the instrument-repo baseline
 - Blank: matched **freepath** (empty compartment, same Ex/slits/speed/step; Em covers 380–420)
 - Settings: Ex **350 nm**, Em **380–420 nm**, slits **10 nm**, **120 nm/min**, step **2 nm**, guide **397 nm**, SNR noise band **410–420 nm**
 - **Gate D** seating still open for factory-qualified claims; DIY fixture baselines are allowed (no hard `500:1` factory gate)
@@ -33,7 +33,7 @@ Normalized observations: `peak_nm`, `peak_delta_nm`, `snr`, `clipped`, `overload
 ## Operator role
 
 1. Acquire / select matched freepath blank (cuvette out, door closed).
-2. Load distilled water cuvette; seat; close compartment.
+2. Load water cuvette (tap for the first live comparison; distilled for wavelength redo); seat; close compartment.
 3. Acknowledge prompts for setup / scan; shutter-off before opening the door.
 4. Abort remains on the instrument console / `/api/abort`.
 
@@ -47,7 +47,7 @@ Normalized observations: `peak_nm`, `peak_delta_nm`, `snr`, `clipped`, `overload
 # uv run python examples/run_water_raman_campaign.py --mode http --interactive
 ```
 
-Until the SDL SOP lands, use spectrometer-lab CLI (`run_water_raman_serial.py` / `summarize_water_raman.py`) against the same IOP; SDL adapters already speak HTTP.
+Until the SDL SOP lands, invoke spectrometer-lab CLI from a sibling checkout (`SPECTROMETER_LAB_ROOT`, unchanged scripts) and copy or summarize campaign artifacts into `runs/`; do not publish tap-water into the distilled calibration set. SDL adapters already speak HTTP for the Stage 3 path.
 
 ## Mapping to SDL dossier
 

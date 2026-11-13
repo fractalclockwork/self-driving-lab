@@ -90,6 +90,7 @@ For **Marlin + C310** prep-area vision, do **not** copy the spectrometer HTTP IO
 - Architecture: [`docs/architecture.md`](../architecture.md)
 - Lab network gateway proposal (OpenWRT + cede-gateways + PDU/health): [`lab_network_gateway.md`](lab_network_gateway.md)
 - Stage 0 HIL bring-up (LS 55 + Marlin + C310): [`docs/roadmap/instrument_hil_bringup.md`](instrument_hil_bringup.md)
+- Lab status display stretch (CRT VTTY): [`tools/lab_status.py`](../../tools/lab_status.py) + crt-drive `vtty_host_lab` (see [`lab_network_gateway.md`](lab_network_gateway.md))
 - Marlin + C310 bring-up + ChArUco card: [`docs/roadmap/marlin_c310_bringup.md`](marlin_c310_bringup.md)
 - Use-case (LS 55 Stage 3 bringup): [`docs/use_cases/water_raman.md`](../use_cases/water_raman.md)
 - Use-case (LS 55 Stage 4 later): [`docs/use_cases/tonic_dilution.md`](../use_cases/tonic_dilution.md)
