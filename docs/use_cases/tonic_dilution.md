@@ -2,6 +2,8 @@
 
 Closed-loop version of spectrometer-lab **Experiment 1** (tonic-water emission spectrum & dilution series).
 
+**Later-stage LS 55 project:** prefer [water Raman bringup](water_raman.md) as the first SDL↔LS 55 loop (Stage 3). This use-case is **Stage 4** — adaptive dilution / IFE — after water-Raman SOP and accept criteria are in place. Existing `TonicDilutionSOP` / fixture CI remain as the advanced reference implementation.
+
 ## Science question
 
 Where does blank-subtracted fluorescence intensity deviate from linear concentration scaling (inner-filter effect onset)?
@@ -9,6 +11,7 @@ Where does blank-subtracted fluorescence intensity deviate from linear concentra
 ## Hardware / chemistry
 
 - Instrument: PerkinElmer LS 55 via spectrometer-lab
+- Physical attach (Pi bench): LS 55 RS-232 via **cede-gateway** Prolific USB–RS232 by-id (CEDE Phase 7); IOP opens the serial node, not Dev-Host USB
 - Fluorophore: commercial tonic water (quinine), aqueous dilutions
 - Settings: Ex **350 nm**, Em **400–550 nm**, **5 nm** slits, guide ~**447 nm**
 - Usefulness gate from DIY baseline: unclipped near ~**1:450** on this mixer

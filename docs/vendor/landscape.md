@@ -66,6 +66,9 @@ A robust SDL requires a layered software and hardware architecture:
 * **API Standardization:** Reliable unattended operations require robust protocols such as REST (JSON/XML), gRPC, GraphQL, SiLA 2, or OPC UA LADS over custom socket solutions.
 
 
+* **Physical / continuous embedded plane (often underspecified):** Orchestration and SiLA-class APIs assume a host that can flash, attach, and attest lab hardware. Industry peers and this PoC’s choice ([CEDE](https://github.com/fractalclockwork/cede)) are surveyed in [`continuous_instrument_development.md`](continuous_instrument_development.md).
+
+
 
 ---
 
@@ -156,6 +159,12 @@ Building a custom SDL relies on open-source tools across four main layers:
 
 
 * **LabOP (Laboratory Open Protocol Language):** Open specification for abstract laboratory protocols that ensures experiment reproducibility across different facilities.
+
+### 5. Continuous instrument & embedded development
+
+SDL orchestration stacks (§1) and device standards (§4) rarely specify how firmware is built, flashed, and attested on a shared lab gateway, or how serial/UVC nodes stay discoverable for IOP services. That plane is **continuous instrument / continuous embedded development**: hardware-CI gateways (Lager, labgrid, Linaro LAA, BenchPod, Cuica), lab SiLA gateway modules, vendor sandboxes/twins (e.g. Rigaku RAI), and fleet OTA (Mender, balena).
+
+This PoC uses **[CEDE](https://github.com/fractalclockwork/cede)** (`build` → `deploy` → `validate` + Phase 7 instrument attach) rather than adopting those peers. Peer comparison and positioning: [`continuous_instrument_development.md`](continuous_instrument_development.md).
 
 ---
 
