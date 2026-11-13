@@ -24,7 +24,7 @@ Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestr
 | --- | --- |
 | `integration` | `sdl.integration.ls55_client` — HTTP to `/api/connect|setup|single-read|scan|review/recompute|state|abort|shutter/off` |
 | `analytical_metrology` | spectrometer-lab `LS55Service` (scout `$RD`, scan `$SC`, review peak/SNR/clip) |
-| `physical_control_plane` | **[CEDE](https://github.com/fractalclockwork/cede)** Dev-Host + cede-gateway — toolchains, flash/sync, stable USB/serial/V4L attach, discovery; DS-7 lifecycle `build` / `deploy` / `validate` / `debug`. See CEDE [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [DS-7 / DS-17](https://github.com/fractalclockwork/cede/blob/main/docs/DESIGN_SPECIFICATION.md), and peer landscape [`docs/vendor/continuous_instrument_development.md`](vendor/continuous_instrument_development.md). |
+| `physical_control_plane` | **[CEDE](https://github.com/fractalclockwork/cede)** Dev-Host + cede-gateway — toolchains, flash/sync, stable USB/serial/V4L attach, discovery; DS-7 lifecycle `build` / `deploy` / `validate` / `debug`. See CEDE [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [DS-7 / DS-17](https://github.com/fractalclockwork/cede/blob/main/docs/DESIGN_SPECIFICATION.md), and peer landscape [`docs/vendor/continuous_instrument_development.md`](vendor/continuous_instrument_development.md). **Lab LAN (proposal):** OpenWRT = L2/L3 instrument network; cede-gateway = non-IP attach; IP PDUs + Dev-Host health rollup = gated ops plane — [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md). |
 | `sample_prep` | OperatorGate prompts (“dilute N× and load”); no liquid handler in v1 |
 | `ai_ml_decision` | `DecisionEngine` protocol; `ClipSNRDilutionPolicy` rules; BayBE can implement the same protocol later |
 | `orchestration` | `CampaignRunner` loop: propose → gate → execute → persist |
@@ -39,7 +39,9 @@ Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestr
 | **Instrument repos** | IOP, abort / idle-safe, acquisition | Campaign policy; gateway OS / by-id contracts |
 | **CEDE** | Toolchains, flash/sync, by-id serial & UVC nodes, access groups (`dialout` / `video`) | Spectrometer protocol, Marlin G-code, campaign policy |
 
-**Live path:** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default for bench instruments). First bridge cohort: **LS 55** (Prolific USB–RS232; bringup [water Raman](use_cases/water_raman.md), later [tonic dilution / IFE](use_cases/tonic_dilution.md)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional metrology](use_cases/prep_area_dimensional.md)).
+**Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; bringup [water Raman](use_cases/water_raman.md), later [tonic dilution / IFE](use_cases/tonic_dilution.md)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](use_cases/prep_area_dimensional.md); ChArUco + Dev-Host vision — [bring-up](roadmap/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco is SDL on the Dev-Host after capture.
+
+**Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md).
 
 ## Loop
 

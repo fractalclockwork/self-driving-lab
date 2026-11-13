@@ -15,6 +15,13 @@ dependencies = [
 dev = [
   "pytest>=8.0",
 ]
+hil = [
+  "pyserial>=3.5",
+]
+calibration = [
+  "opencv-contrib-python>=4.8",
+  "reportlab>=4.0",
+]
 
 [build-system]
 requires = ["hatchling"]

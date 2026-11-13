@@ -6,7 +6,7 @@ Thin **Level-4** open-source self-driving laboratory (SDL) skeleton: orchestrati
 
 **LS 55 later (Stage 4):** [tonic dilution / IFE](docs/use_cases/tonic_dilution.md) — adaptive dilute / remeasure / scan / stop (SOP + policy already exist as reference).
 
-**Gantry (planned):** **Marlin + Logitech C310** prep-area imaging and dimensional metrology with printed camera calibration cards — [`docs/use_cases/prep_area_dimensional.md`](docs/use_cases/prep_area_dimensional.md).
+**Gantry (Stage 0):** **Marlin + Logitech C310** prep-area imaging — printable ChArUco card in [`docs/calibration/`](docs/calibration/); frames and vision on the Dev-Host ([bring-up](docs/roadmap/marlin_c310_bringup.md), [use-case](docs/use_cases/prep_area_dimensional.md)).
 
 ## Stack map
 
@@ -14,19 +14,25 @@ Thin **Level-4** open-source self-driving laboratory (SDL) skeleton: orchestrati
 | --- | --- |
 | Integration | [`src/sdl/integration/ls55_client.py`](src/sdl/integration/ls55_client.py) |
 | Analytical metrology | spectrometer-lab FastAPI (`/api/*`) |
-| Physical / continuous embedded | [CEDE](https://github.com/fractalclockwork/cede) Dev-Host + cede-gateway (Phase 7) |
+| Physical / continuous embedded | [CEDE](https://github.com/fractalclockwork/cede) Dev-Host + cede-gateway (Phase 7); lab LAN proposal: [`docs/roadmap/lab_network_gateway.md`](docs/roadmap/lab_network_gateway.md) |
 | Sample prep | Operator prompts (no robotics in v1) |
 | AI/ML decision | [`src/sdl/decision/policy.py`](src/sdl/decision/policy.py) (`ClipSNRDilutionPolicy`; BayBE later) |
 | Orchestration | [`src/sdl/orchestration/`](src/sdl/orchestration/) |
 | Data backbone | [`src/sdl/data/store.py`](src/sdl/data/store.py) → `runs/` |
 
-Industry context: [`docs/vendor/landscape.md`](docs/vendor/landscape.md). Continuous instrument peers: [`docs/vendor/continuous_instrument_development.md`](docs/vendor/continuous_instrument_development.md). Architecture: [`docs/architecture.md`](docs/architecture.md). Use-cases: [`water Raman`](docs/use_cases/water_raman.md), [`tonic dilution`](docs/use_cases/tonic_dilution.md) (later), [`prep-area dimensional`](docs/use_cases/prep_area_dimensional.md). Instrument bringup: [`docs/roadmap/instrument_bringup.md`](docs/roadmap/instrument_bringup.md).
+Industry context: [`docs/vendor/landscape.md`](docs/vendor/landscape.md). Continuous instrument peers: [`docs/vendor/continuous_instrument_development.md`](docs/vendor/continuous_instrument_development.md). Architecture: [`docs/architecture.md`](docs/architecture.md). Use-cases: [`water Raman`](docs/use_cases/water_raman.md), [`tonic dilution`](docs/use_cases/tonic_dilution.md) (later), [`prep-area dimensional`](docs/use_cases/prep_area_dimensional.md). Instrument bringup: [`docs/roadmap/instrument_bringup.md`](docs/roadmap/instrument_bringup.md). Lab network gateway (proposal): [`docs/roadmap/lab_network_gateway.md`](docs/roadmap/lab_network_gateway.md). Marlin + C310: [`docs/roadmap/marlin_c310_bringup.md`](docs/roadmap/marlin_c310_bringup.md).
 
 ## Quick start
 
 ```bash
 uv sync --all-extras
 uv run pytest -q
+
+# Stage 0 HIL attach (fixture / no hardware)
+uv run python tools/instrument_hil_bringup.py --fixture
+
+# Printable prep-area ChArUco (Dev-Host; optional --extra calibration to regenerate)
+# docs/calibration/prep_area_charuco_{letter,a4}.pdf
 
 # Offline closed loop (no instrument)
 uv run python examples/run_tonic_campaign.py --mode fixture
@@ -35,7 +41,9 @@ uv run python examples/run_tonic_campaign.py --mode fixture
 uv run python examples/run_tonic_campaign.py --mode http --interactive
 ```
 
-Campaign artifacts land under `runs/<campaign_id>/` (`state.json`, `events.jsonl`) and `runs/catalog.json`.
+Cohort HIL (LS 55 identity + Marlin M115 + C310 capture): [`docs/roadmap/instrument_hil_bringup.md`](docs/roadmap/instrument_hil_bringup.md) (`uv sync --extra hil`). Run from the Dev-Host; C310 frames default to `runs/hil_<utc>/c310.jpg` (gateway `/tmp` is temporary only).
+
+Campaign artifacts land under `runs/<campaign_id>/` (`state.json`, `events.jsonl`) and `runs/catalog.json` on the Dev-Host.
 
 ## Operator-first safety
 

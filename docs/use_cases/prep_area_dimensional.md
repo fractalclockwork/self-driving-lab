@@ -1,19 +1,20 @@
 # Use-case: Prep-area imaging / dimensional metrology
 
-First **Marlin gantry + Logitech C310** science loop: image the sample-preparation area and recover **dimensional measurements** (mm) using **printed camera calibration cards**.
+First **Marlin gantry + Logitech C310** science loop: image the sample-preparation area and recover **dimensional measurements** (mm) using the committed **ChArUco** calibration card (`sdl-prep-charuco-v1`).
 
-Planning / design only until Stage 2–3 clients exist — see [instrument bringup](../roadmap/instrument_bringup.md).
+Planning / design only until Stage 2–3 clients exist — see [instrument bringup](../roadmap/instrument_bringup.md) and [Marlin + C310 bring-up](../roadmap/marlin_c310_bringup.md).
 
 ## Science / engineering question
 
-From a named gantry pose over the prep area, can the C310 recover metric scale from a printed calibration card and report feature sizes (and later clearances / placement checks) with provenance in the campaign store?
+From a named gantry pose over the prep area, can the C310 recover metric scale from the printed ChArUco card and report feature sizes (and later clearances / placement checks) with provenance in the campaign store on the **Dev-Host**?
 
 ## Hardware
 
-- **Motion:** Marlin on Arduino Mega — home, move XYZ, report pose (IOP external; G-code stays out of SDL)
-- **Vision:** Logitech C310 UVC on **cede-gateway** (`046d:081b`; `/dev/video0` or `/dev/v4l/by-id/*`)
-- **Calibration target:** printed camera calibration card(s) (checkerboard / ChArUco / similar) placed in the prep area for the exercise; known square/marker pitch in mm is the ground-truth scale
-- **Physical attach:** CEDE Phase 7 first cohort (Mega CDC by-id + C310); IOP opens gateway nodes, not Dev-Host USB by default
+- **Motion:** Marlin on Arduino Mega — home, move XYZ, report pose (IOP external when present; G-code stays out of SDL SOPs)
+- **Vision capture:** Logitech C310 UVC on **cede-gateway** (`046d:081b`; `/dev/video0` or `/dev/v4l/by-id/*`); gateway holds only a temporary capture file
+- **Calibration target:** [`docs/calibration/`](../calibration/) ChArUco PDFs — `DICT_4X4_50`, 5×7, square 24.0 mm, marker 18.0 mm; ruler-check the 100 mm bar
+- **Physical attach:** CEDE Phase 7 first cohort (Mega CDC by-id + C310); open gateway nodes, not Dev-Host USB by default
+- **Metrology:** ChArUco detect / scale / mm lengths run on the **Dev-Host** (SDL), after the frame is copied into `runs/`. Not a spectrometer-style HTTP vision IOP
 
 ## Loop behavior (target)
 
@@ -23,7 +24,7 @@ From a named gantry pose over the prep area, can the C310 recover metric scale f
 | At waypoint, no card / card not detected | Propose **reposition** or operator place/fix card; re-capture |
 | Card detected, scale OK | Propose **measure** named features (bbox / segment lengths in mm) |
 | Scale residual above threshold | Propose **re-calibrate** (re-capture or nudge Z / exposure) |
-| Measurements accepted | Persist frame + pose + scale + mm results; **stop** or next waypoint |
+| Measurements accepted | Persist frame + pose + scale + mm results on Dev-Host; **stop** or next waypoint |
 | Estop / soft-stop | Idle-safe axes; abort reachable by operator |
 
 Normalized observations (not raw V4L dumps as the SOP primary type): e.g. `pose_mm`, `frame_id`, `scale_mm_per_px`, `feature_lengths_mm`, `calibration_rms`.
@@ -32,9 +33,10 @@ Normalized observations (not raw V4L dumps as the SOP primary type): e.g. `pose_
 
 Until automation is trusted:
 
-1. Clear the prep area; place the printed calibration card flat in the field of view.
+1. Clear the prep area; place the printed ChArUco card flat in the field of view (100 mm bar verified).
 2. Arm motion (operator gate) before home / moves.
 3. Acknowledge capture steps; abort remains available on the motion console / IOP.
+4. Run capture from the Dev-Host so durable frames land under `runs/`.
 
 ## Run (when clients exist)
 
@@ -42,22 +44,23 @@ Until automation is trusted:
 # Dry-run (fixture poses + synthetic card frames) — TBD
 # uv run python examples/run_prep_area_campaign.py --mode fixture
 
-# Live — Marlin + C310 IOPs on gateway — TBD
-# uv run python examples/run_prep_area_campaign.py --mode http --interactive
+# Live — motion/capture against gateway nodes; store + vision on Dev-Host — TBD
+# uv run python examples/run_prep_area_campaign.py --mode live --interactive
 ```
 
-Artifacts (target): `runs/<campaign_id>/` with state, events, and linked frame provenance; catalog stop reason (`measurements_ok`, `calibration_failed`, etc.).
+Artifacts (target): Dev-Host `runs/<campaign_id>/` with state, events, and linked frame provenance; catalog stop reason (`measurements_ok`, `calibration_failed`, etc.). Gateway `/tmp` frames are deleted after copy.
 
 ## Mapping to SDL dossier
 
 | Dossier key | Role here |
 | --- | --- |
-| `integration` | Future `GantryClient` / `CameraClient` (or combined motion+vision) + fixtures |
-| `analytical_metrology` | Vision dimensional metrology (scale from printed card; lengths in mm) |
+| `integration` | Future motion/capture clients + fixtures (paths/bytes to Dev-Host; not an HTTP vision IOP) |
+| `analytical_metrology` | Dev-Host SDL ChArUco / dimensional metrology (scale from printed card; lengths in mm) |
 | `sample_prep` | Images the prep area; precursor to load-verify / assist on tonic dilution |
 | `ai_ml_decision` | Simple rules first (detect card → measure → stop); BayBE later if needed |
 | `orchestration` | `CampaignRunner` + operator-gated waypoint SOP |
-| `physical_control_plane` | CEDE cede-gateway attach for Mega + C310 |
+| `physical_control_plane` | CEDE cede-gateway attach for Mega + C310 (attach host, not campaign host) |
+| `data_backbone` | Dev-Host `runs/` only |
 | `robotics_handling` | Stage 5 later — unattended prep; this use-case stays Stage 3–4 first |
 
-This is a **vision metrology** loop (calibrate → measure → accept), not fluorescence. It shares the same adapter contract as the LS 55: SOP talks HTTP to IOP; CEDE owns attach only.
+This is a **vision metrology** loop (calibrate → measure → accept), not fluorescence. Spectrometer HTTP IOP shape remains for LS 55 / modern spectrometers; prep-area vision stays local on the Dev-Host after capture.
