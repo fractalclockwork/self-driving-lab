@@ -11,7 +11,7 @@ Stage **0** remainder and data-plane rules for the gantry + Logitech C310 cohort
 
 Canonical HIL path: run on the **Dev-Host** with `--ssh-gateway`. Capture on the gateway writes `/tmp`, then `scp` to Dev-Host `runs/hil_<utc>/c310.jpg`, then delete the remote file. Pi-local HIL is attach smoke only — not the campaign store.
 
-ChArUco detection and dimensional metrology are **SDL on the Dev-Host** after the frame is local. Do **not** model this loop as a spectrometer-lab-style HTTP vision IOP; that HTTP shape fits a modern spectrometer better. Motion may still use an external Marlin IOP later; frame grab may be HIL/`scp` or a thin helper — neither keeps frames on the gateway nor runs detection there.
+ChArUco detection and dimensional metrology are **campaign code on the Dev-Host** after the frame is local. Do **not** model this loop as a spectrometer-lab-style HTTP vision IOP; that HTTP shape fits a modern spectrometer better. Motion may still use an external Marlin IOP later; frame grab may be HIL/`scp` or a thin helper — neither keeps frames on the gateway nor runs detection there.
 
 ```mermaid
 flowchart LR
@@ -19,7 +19,7 @@ flowchart LR
   tmp --> scp[scp to Dev-Host]
   scp --> rm[rm gateway file]
   rm --> runs["Dev-Host runs/"]
-  runs --> vision["SDL ChArUco / mm"]
+  runs --> vision["campaign ChArUco / mm"]
 ```
 
 CEDE’s “instrument host” language means **attach** host (by-id serial/UVC), not the campaign or vision host.
@@ -51,7 +51,7 @@ uv run python tools/prep_area_charuco_card.py --out-dir docs/project/calibration
 
 ## Ladder next steps
 
-See [`instrument_bringup.md`](instrument_bringup.md) and [`prep_area_dimensional.md`](prep_area_dimensional.md). Stages 1–4 stay planning until motion/capture clients exist; vision policy and ChArUco detect remain Dev-Host SDL work.
+See [`instrument_bringup.md`](instrument_bringup.md) and [`prep_area_dimensional.md`](prep_area_dimensional.md). Stages 1–4 stay planning until motion/capture clients exist; vision policy and ChArUco detect remain campaign work on the Dev-Host.
 
 ## Related
 

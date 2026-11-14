@@ -2,7 +2,7 @@
 
 **Status:** project proposal (requirements + topology only). No OpenWRT configs, PDU drivers, or health code in this change set.
 
-**Purpose:** map a mixed instrument floor—exemplified by the SFSU [E-Lab](https://github.com/E-Lab-SFSU)—onto one addressable lab LAN for SDL orchestration, including **power control** and **instrument health**, while keeping today’s CEDE attach semantics (USB/serial/UVC on the **cede-gateway**, campaign/`runs/` on the **Dev-Host**).
+**Purpose:** map a mixed instrument floor—exemplified by the SFSU [E-Lab](https://github.com/E-Lab-SFSU)—onto one addressable lab LAN for campaign orchestration, including **power control** and **instrument health**, while keeping today’s CEDE attach semantics (USB/serial/UVC on the **cede-gateway**, campaign/`runs/` on the **Dev-Host**).
 
 E-Lab public platforms ([RoboCam 3.1](https://e-lab-sfsu.github.io/RoboCam3.1/), FlyCam lineage, StentorCam, FlyShock/FlyShaker) are the **requirements exemplar**. This repo does not claim to control that hardware today.
 
@@ -12,20 +12,20 @@ E-Lab public platforms ([RoboCam 3.1](https://e-lab-sfsu.github.io/RoboCam3.1/),
 | --- | --- |
 | **Lab network gateway** | OpenWRT AP/router: L2/L3 instrument LAN (Ethernet + WiFi, DHCP, DNS/mDNS) |
 | **cede-gateway** | CEDE Phase 7 attach host (Pi): USB–RS232, CDC, UVC, CSI-via-Pi, GPIO |
-| **Dev-Host** | SDL orchestration, adapters, campaign store, vision, health rollup, gated power actions |
+| **Dev-Host** | Campaign orchestration, adapters, campaign store, vision, health rollup, gated power actions |
 | **IP smart PDU** | Networked power strip on the lab LAN (per-outlet on/off; optional energy) |
 
 Do not collapse “gateway” into one box: the router never exposes `/dev/serial`; the cede-gateway is not the lab DHCP authority.
 
 ## Problem
 
-Bench instruments arrive as Ethernet, WiFi, USB serial, UVC, CSI, GPIO, and mains-powered gear. Today this PoC covers USB attach via cede-gateway (LS 55 Prolific, Marlin Mega CDC, C310 UVC) and has **no** lab LAN, PDU, or health plane. A unified network is required before Stage 0 inventory can name IP devices, outlets, and reachability the same way it names USB by-id nodes.
+Bench instruments arrive as Ethernet, WiFi, USB serial, UVC, CSI, GPIO, and mains-powered gear. Today this lab covers USB attach via cede-gateway (LS 55 Prolific, Marlin Mega CDC, C310 UVC) and has **no** lab LAN, PDU, or health plane. A unified network is required before Stage 0 inventory can name IP devices, outlets, and reachability the same way it names USB by-id nodes.
 
 ## Requirements
 
 ### Interface inventory
 
-| Physical class | Lab examples (E-Lab / this PoC) | Attach path |
+| Physical class | Lab examples (E-Lab / this lab) | Attach path |
 | --- | --- | --- |
 | USB serial / CDC | Marlin printer boards; LS 55 Prolific USB–RS232 | cede-gateway by-id |
 | USB camera | Player One; UVC webcams; Logitech C310 | cede-gateway UVC / vendor USB |
@@ -64,7 +64,7 @@ flowchart TB
   end
   subgraph labLan [Lab_instrument_LAN_OpenWRT]
     Router[OpenWRT_AP_router]
-    DevHost[Dev_Host_SDL]
+    DevHost[Dev_Host]
     GW1[cede_gateway_A]
     GW2[cede_gateway_B]
     EthDev[Ethernet_instruments]
@@ -90,7 +90,7 @@ flowchart TB
 
 1. **OpenWRT (lab network gateway)** — DHCP, DNS/mDNS, Ethernet + WiFi for IP instruments and PDUs. Does not expose serial/GPIO.
 2. **cede-gateway(s)** — DHCP clients; CEDE Phase 7 attach for USB/serial/UVC/CSI/GPIO. IOP opens nodes; temporary capture only.
-3. **Dev-Host** — SDL orchestration; SSH/IOP to gateways; HTTP to IP instruments; **health aggregation** and gated **power actions**.
+3. **Dev-Host** — campaign orchestration; SSH/IOP to gateways; HTTP to IP instruments; **health aggregation** and gated **power actions**.
 4. **IP smart PDUs** — per-outlet on/off (+ optional watts); first-class LAN citizens.
 5. **Instrument IOP services** — stay outside CEDE (spectrometer-lab, future Marlin/RoboCam-shaped services). Health probes may call IOP `state` / identity; power kill is not IOP abort.
 
@@ -98,8 +98,8 @@ flowchart TB
 
 | Class / platform | Control plane | Power binding |
 | --- | --- | --- |
-| LS 55 (this PoC) | cede-gateway Prolific by-id → spectrometer-lab IOP | Named outlet for instrument (and optionally gateway) |
-| Marlin gantry + C310 (this PoC) | Mega CDC + UVC on cede-gateway | Printer / camera / gateway outlets as needed |
+| LS 55 (this lab) | cede-gateway Prolific by-id → spectrometer-lab IOP | Named outlet for instrument (and optionally gateway) |
+| Marlin gantry + C310 (this lab) | Mega CDC + UVC on cede-gateway | Printer / camera / gateway outlets as needed |
 | RoboCam Marlin path | USB serial on attach host (cede-gateway) | Motion stage + camera outlets |
 | RoboCam Klipper/Moonraker path | HTTP on OpenWRT lab LAN | Controller / Pi / camera outlets |
 | Pi Camera / Player One / GPIO laser | cede-gateway local USB/CSI/GPIO | Same bench strip as the attach host when shared |
@@ -141,12 +141,12 @@ Campaigns refuse **live** mode when required devices are not `healthy` (fixture 
 
 **Stretch (display, not campaign gate):** [`tools/lab_status.py`](../../../tools/lab_status.py) / `sdl.hil.status` is a Dev-Host read-mostly snapshot of layers 2–4 (gateway SSH, USB/V4L attach, LS 55 identity / Marlin `M115`). It distinguishes LS 55 **ADAPTER** (by-id present, no IOP reply — e.g. instrument powered off) from Marlin **CTRL OK** (Mega answers `M115` even when gantry mains are off; pass `--note` for mains until PDUs exist). [crt-drive](https://github.com/fractalclockwork/crt-drive) `vtty_host_lab` paints a phosphor dashboard (LEDs / clock / rules); local Pico via `make vtty-start HOST=vtty_host_lab`, Pico on cede-pi via `tools/vtty_lab_gateway.sh`. Not layer 1 / not `powered_off` aggregate.
 
-## SDL implications
+## Campaign implications
 
 - **Stage 0 inventory** cites IP identity, `outlet_id`, and health probe hooks the same way it cites CEDE by-id stubs ([`instrument_bringup.md`](instrument_bringup.md)).
 - **HIL** may later add reachability / outlet-status checks; attach smoke remains CEDE/IOP territory. Lab-status + CRT VTTY is a display stretch beside HIL, not a live-mode gate.
 - **Orchestration** gates live campaigns on aggregate health; power actions stay outside the SOP science loop unless an explicit armed recovery step is designed later.
-- Ownership unchanged: CEDE = gateway OS / attach; instrument repos = IOP; SDL = inventory shape, health rollup, gated power ops, science loop. OpenWRT/PDU lab-ops config can live under this proposal until a later CEDE decision. CRT glass painting stays in crt-drive; SDL owns the status JSON.
+- Ownership unchanged: CEDE = gateway OS / attach; instrument repos = IOP; this repo = inventory shape, health rollup, gated power ops, science loop. OpenWRT/PDU lab-ops config can live under this proposal until a later CEDE decision. CRT glass painting stays in crt-drive; this repo owns the status JSON.
 - No ChemOS / AlabOS / IvoryOS, SiLA 2, or OPC UA adoption.
 
 ## Phased proposal (paper only)

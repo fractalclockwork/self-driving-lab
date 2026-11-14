@@ -12,11 +12,11 @@ From a named gantry pose over the prep area, can the C310 recover metric scale f
 
 ## Hardware
 
-- **Motion:** Marlin on Arduino Mega — home, move XYZ, report pose (IOP external when present; G-code stays out of SDL SOPs)
+- **Motion:** Marlin on Arduino Mega — home, move XYZ, report pose (IOP external when present; G-code stays out of campaign SOPs)
 - **Vision capture:** Logitech C310 UVC on **cede-gateway** (`046d:081b`; `/dev/video0` or `/dev/v4l/by-id/*`); gateway holds only a temporary capture file
 - **Calibration target:** [`docs/project/calibration/`](../calibration/) ChArUco PDFs — `DICT_4X4_50`, 5×7, square 24.0 mm, marker 18.0 mm; ruler-check the 100 mm bar
 - **Physical attach:** CEDE Phase 7 first cohort (Mega CDC by-id + C310); open gateway nodes, not Dev-Host USB by default
-- **Metrology:** ChArUco detect / scale / mm lengths run on the **Dev-Host** (SDL), after the frame is copied into `runs/`. Not a spectrometer-style HTTP vision IOP
+- **Metrology:** ChArUco detect / scale / mm lengths run on the **Dev-Host** (this repo), after the frame is copied into `runs/`. Not a spectrometer-style HTTP vision IOP
 
 ## Loop behavior (target)
 
@@ -52,12 +52,12 @@ Until automation is trusted:
 
 Artifacts (target): Dev-Host `runs/<campaign_id>/` with state, events, and linked frame provenance; catalog stop reason (`measurements_ok`, `calibration_failed`, etc.). Gateway `/tmp` frames are deleted after copy.
 
-## Mapping to SDL dossier
+## Mapping to campaign layers
 
 | Dossier key | Role here |
 | --- | --- |
 | `integration` | Future motion/capture clients + fixtures (paths/bytes to Dev-Host; not an HTTP vision IOP) |
-| `analytical_metrology` | Dev-Host SDL ChArUco / dimensional metrology (scale from printed card; lengths in mm) |
+| `analytical_metrology` | Dev-Host campaign ChArUco / dimensional metrology (scale from printed card; lengths in mm) |
 | `sample_prep` | Images the prep area; precursor to load-verify / assist on tonic dilution |
 | `ai_ml_decision` | Simple rules first (detect card → measure → stop); BayBE later if needed |
 | `orchestration` | `CampaignRunner` + operator-gated waypoint SOP |

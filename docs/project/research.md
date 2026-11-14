@@ -10,7 +10,7 @@ Decision record for the physical plane and the science loop. Peer products are c
 | LS 55 instrument IOP | [spectrometer-lab](https://github.com/fractalclockwork/spectrometer-lab) |
 | Build, deploy, validate, and by-id serial / UVC attach | [CEDE](https://github.com/fractalclockwork/cede) Dev-Host + cede-gateway |
 
-Continuous instrument development here means four steps: a reproducible toolchain produces an artifact, that artifact is flashed or synced onto lab hardware, the running image is attested, and serial / UVC / USB nodes stay discoverable so an external IOP and an SDL adapter can talk. The default bench path is the gateway, and the campaign store stays on the Dev-Host.
+Continuous instrument development here means four steps: a reproducible toolchain produces an artifact, that artifact is flashed or synced onto lab hardware, the running image is attested, and serial / UVC / USB nodes stay discoverable so an external IOP and a campaign adapter can talk. The default bench path is the gateway, and the campaign store stays on the Dev-Host.
 
 Orchestrators and device standards assume some physical plane. They rarely specify that build → deploy → validate loop, which is why `physical_control_plane` is CEDE. See CEDE [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md) and [DS-7 / DS-17](https://github.com/fractalclockwork/cede/blob/main/docs/DESIGN_SPECIFICATION.md).
 

@@ -80,9 +80,9 @@ Still open when: a HIL fixture pass is counted as Stage 0 complete; a motion cli
 
 **Campaign record.**
 
-Specific: every live judgment carries a run directory a later student can read, with SDL sample identity and a method citation.
+Specific: every live judgment carries a run directory a later student can read, with campaign sample identity and a method citation.
 
-Measurable: `runs/<id>/` holds the artifacts and a `REPORT.md`; the SDL label names the chemistry; the method citation points at the instrument procedure; tap-water results stay out of the distilled published set.
+Measurable: `runs/<id>/` holds the artifacts and a `REPORT.md`; the campaign label names the chemistry; the method citation points at the instrument procedure; tap-water results stay out of the distilled published set.
 
 Baseline: series `20261113-214920` meets this for that series. The IOP sidecar on that run still says distilled water. Store layout is `state.json`, `events.jsonl`, and `runs/catalog.json` on the Dev-Host.
 
@@ -94,7 +94,7 @@ Dependencies: `CampaignStore`; the operator’s `REPORT.md` for physical-loop as
 
 Evidence: [tap-water report](../../runs/tap_water_raman_20261113-214920/REPORT.md).
 
-Done when: a live campaign’s directory contains the judgment, the SDL sample label, the method citation, and the instrument settings, and tap-water data remains in this repo’s `runs/`.
+Done when: a live campaign’s directory contains the judgment, the campaign sample label, the method citation, and the instrument settings, and tap-water data remains in this repo’s `runs/`.
 
 Still open when: a live scan has no `REPORT.md`, the IOP sidecar string is used as the chemistry label, or tap water is copied into spectrometer-lab `data/published/water-raman/`.
 
@@ -118,4 +118,4 @@ Evidence: charter scope lists; review of any SOP or adapter added for OBJ-1 or O
 
 Done when: each new campaign path has an adapter or fixture boundary, and scope changes show up in the charter before they show up in code.
 
-Still open when: a patch vendors instrument protocol into this repo, edits spectrometer-lab or CEDE from an SDL session, or starts Stage 5 without a charter change.
+Still open when: a patch vendors instrument protocol into this repo, edits spectrometer-lab or CEDE from a session in this repo, or starts Stage 5 without a charter change.

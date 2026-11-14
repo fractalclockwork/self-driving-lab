@@ -1,6 +1,6 @@
 # Instrument HIL bring-up (LS 55 + Marlin + C310)
 
-Stage **0** attach attestation for the CEDE↔SDL first cohort. Probes the LS 55 over **RS-232** via spectrometer-lab’s read-only identity dump, pings Marlin with **M115**, and **activates** the Logitech C310 with a one-shot capture. No Xe energize, no gantry motion, no campaign SOP. The spectrometer-lab **GUI / dashboard** (FastAPI `:8055`) is Stage 1 unsigned / on hold — HIL does **not** use `GET /api/state`.
+Stage **0** attach attestation for the first CEDE cohort used by this repo. Probes the LS 55 over **RS-232** via spectrometer-lab’s read-only identity dump, pings Marlin with **M115**, and **activates** the Logitech C310 with a one-shot capture. No Xe energize, no gantry motion, no campaign SOP. The spectrometer-lab **GUI / dashboard** (FastAPI `:8055`) is Stage 1 unsigned / on hold — HIL does **not** use `GET /api/state`.
 
 Implementation: [`tools/instrument_hil_bringup.py`](../../../tools/instrument_hil_bringup.py) → [`src/sdl/hil/bringup.py`](../../../src/sdl/hil/bringup.py).
 

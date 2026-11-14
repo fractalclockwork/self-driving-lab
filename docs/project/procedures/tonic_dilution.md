@@ -49,6 +49,6 @@ uv run python examples/run_tonic_campaign.py --mode http --interactive \
 
 Artifacts: `runs/<campaign_id>/state.json`, `events.jsonl`, and catalog entry with stop reason (`ife_onset`, etc.).
 
-## Mapping to SDL dossier
+## Mapping to campaign layers
 
-This is an **exploration** loop (adaptive next experiment), not a fixed HTS grid. Adaptive quality (clip → dilute/remeasure) mirrors the dossier’s Rigaku-style instrument correction idea, applied here to **sample concentration** as well as (later) slits/`$PV`.
+This is an **exploration** loop (adaptive next experiment) rather than a fixed high-throughput grid. Adaptive quality (clip → dilute/remeasure) applies an instrument-correction idea to **sample concentration** as well as (later) slits/`$PV`.

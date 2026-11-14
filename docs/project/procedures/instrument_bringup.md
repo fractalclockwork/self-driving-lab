@@ -2,7 +2,7 @@
 
 Scope, status, and permission: [project record](../README.md). This page is the stage ladder and its exit criteria. If it disagrees with the [charter](../charter.md) on scope or permission, the charter wins.
 
-Canonical ladder for bringing lab instruments into this PoC. This repo owns orchestration, decision, and data; instrument operating procedures (IOPs) stay in a dedicated service when possible (spectrometer-lab for the LS 55). **Physical attach and continuous embedded lifecycle** (build → deploy → validate, by-id serial/UVC) live in [CEDE](https://github.com/fractalclockwork/cede) — gateway as **attach** host (Phase 7), not the campaign or vision host. Durable artifacts and all image processing live on the **Dev-Host** (`runs/`). Every new device climbs the same stages; the LS 55 is the gold-standard science example; LS 55 + Marlin gantry + Logitech C310 are the first CEDE↔SDL bridge cohort.
+Canonical ladder for bringing lab instruments into this lab. This repo owns orchestration, decision, and data; instrument operating procedures (IOPs) stay in a dedicated service when possible (spectrometer-lab for the LS 55). **Physical attach and continuous embedded lifecycle** (build → deploy → validate, by-id serial/UVC) live in [CEDE](https://github.com/fractalclockwork/cede) — gateway as **attach** host (Phase 7), with the campaign and vision host on the Dev-Host. Durable artifacts and all image processing live on the **Dev-Host** (`runs/`). Every new device climbs the same stages; the LS 55 is the gold-standard science example; LS 55 + Marlin gantry + Logitech C310 are the first cohort that bridges CEDE attach to this repo.
 
 **Terminology:** Ladder **stages** (0–5) are maturity levels in this document. Spectrometer-lab **Gate A / Gate D** are hardware safety and seating qualifications — not ladder stages. Older docs that said “Stage 4+ robotics” mean **Stage 5** here.
 
@@ -20,13 +20,13 @@ flowchart LR
 | Stage | Name | Read next | Exit criteria (generic) |
 | --- | --- | --- | --- |
 | 0 | Inventory & safety | Cohort HIL: [`instrument_hil_bringup`](instrument_hil_bringup.md). Marlin remainder: [`marlin_c310_bringup`](marlin_c310_bringup.md), [OBJ-3](../objectives.md#obj-3). | Physical I/O known via CEDE gateway inventory; hazards and abort path named; HIL tool PASS on LS 55 RS-232 identity + Marlin M115 + C310 capture. For IP devices, outlets, and health layers, see [`lab_network_gateway`](lab_network_gateway.md) (proposal). |
-| 1 | IOP owned elsewhere or stubbed | spectrometer-lab FastAPI on `:8055` | Device mechanics behind a stable API; SDL never parses the wire protocol |
+| 1 | IOP owned elsewhere or stubbed | spectrometer-lab FastAPI on `:8055` | Device mechanics behind a stable API; this repo never parses the wire protocol |
 | 2 | Integration adapter | [`src/sdl/integration/ls55_client.py`](../../../src/sdl/integration/ls55_client.py) — `LS55Client`, HTTP + fixture | Protocol + live client + offline fixture; normalized result types |
 | 3 | Operator-gated SOP | [OBJ-1](../objectives.md#obj-1), [water Raman](water_raman.md). Loop types: `CampaignRunner`, `OperatorGate`. | Propose → `OperatorGate` → execute → persist |
 | 4 | Closed-loop policy | [OBJ-2](../objectives.md#obj-2), [tonic dilution / IFE](tonic_dilution.md) | Adaptive next-action from measurements; explicit stop conditions |
 | 5 | Robotics / unattended | [Outside the current baseline](../charter.md#outside-this-baseline) | Sample prep / transport no longer human-actuated |
 
-Stage 0 for bench instruments should cite the **CEDE first-cohort** device identity (USB by-id / V4L) from [CEDE DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md) and stubs in [`config/lab.example.yaml`](https://github.com/fractalclockwork/cede/blob/main/config/lab.example.yaml). CEDE does not absorb IOP protocol: SDL LS 55 loops still depend on spectrometer-lab.
+Stage 0 for bench instruments should cite the **CEDE first-cohort** device identity (USB by-id / V4L) from [CEDE DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md) and stubs in [`config/lab.example.yaml`](https://github.com/fractalclockwork/cede/blob/main/config/lab.example.yaml). CEDE does not absorb IOP protocol: LS 55 campaign loops still depend on spectrometer-lab.
 
 ### Safety invariants (all stages)
 
@@ -65,13 +65,13 @@ For **spectrometers** (LS 55 today; modern spectrometers later), mirror the HTTP
 - Optional device-specific setup (optics, home, exposure) stays on the adapter, not in the policy.
 - **Physical attach** via CEDE cede-gateway (by-id serial / UVC); IOP opens those nodes, not Dev-Host USB by default.
 
-For **Marlin + C310** prep-area vision, do **not** copy the spectrometer HTTP IOP shape for detection. Capture may use HIL/`scp` or a thin helper against gateway nodes; ChArUco / mm metrology is Dev-Host SDL after the frame is in `runs/`. See [`marlin_c310_bringup.md`](marlin_c310_bringup.md).
+For **Marlin + C310** prep-area vision, do **not** copy the spectrometer HTTP IOP shape for detection. Capture may use HIL/`scp` or a thin helper against gateway nodes; ChArUco / mm metrology is campaign code on the Dev-Host after the frame is in `runs/`. See [`marlin_c310_bringup.md`](marlin_c310_bringup.md).
 
 ## Suggested sequence: Marlin gantry + Logitech C310
 
 1. **Stage 0** — Inventory from CEDE first cohort: Marlin on Arduino Mega CDC (`/dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_*`, confirm `M115` before locking `lab.yaml`); Logitech C310 UVC (`046d:081b`, typically `/dev/video0` or `/dev/v4l/by-id/*`); print/ruler-check [`docs/project/calibration/`](../calibration/) ChArUco; workspace limits; estop / soft-stop story. Run [`instrument_hil_bringup`](instrument_hil_bringup.md) from the Dev-Host (`--ssh-gateway`). Details: [`marlin_c310_bringup.md`](marlin_c310_bringup.md). Do not wire stubs into Hello Lab Uno resolvers (`usb-Arduino_*` also matches Mega).
 2. **Stage 1** — Minimal Marlin IOP (home, move XYZ, report position) if/when needed; frame grab remains temporary on the gateway. Keep G-code and durable V4L storage out of gateway-side services.
-3. **Stage 2** — SDL motion/capture clients + fixtures that return Dev-Host paths / fake frames — **not** an HTTP vision IOP for ChArUco.
+3. **Stage 2** — Campaign motion/capture clients + fixtures that return Dev-Host paths / fake frames. ChArUco detection stays a Dev-Host step, and the capture client is a fixture or a thin helper rather than an HTTP vision IOP.
 4. **Stage 3** — Operator-gated prep-area SOP (home → `prep_overview` → capture → Dev-Host persist) via `CampaignRunner`; see [prep-area dimensional use-case](prep_area_dimensional.md).
 5. **Stage 4** — Policy on card detect / scale residual / accept measurements (mm) on the Dev-Host; later load-verify or LS 55 prep assist can reuse motion+capture adapters.
 6. **Stage 5** — Unattended prep / transport that can stand in for today’s human sample-prep actuator.

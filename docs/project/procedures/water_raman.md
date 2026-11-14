@@ -2,7 +2,7 @@
 
 Objective: [OBJ-1](../objectives.md#obj-1). Ladder position: [project status](../README.md).
 
-Water O–H Raman band as the wavelength / SNR loop: operator-gated connect → setup → scan → accept, with a thin accept/reject rule. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md) (standalone IOP — SDL does not edit that repo). Distilled series `20261103-1629` is the wavelength / fixture reference; the live SDL comparison series uses **tap water** and is recorded under [`runs/tap_water_raman_20261113-214920/`](../../../runs/tap_water_raman_20261113-214920/REPORT.md). Tap-water artifacts stay in this repo’s `runs/`. The distilled calibration set stays in spectrometer-lab.
+Water O–H Raman band as the wavelength / SNR loop: operator-gated connect → setup → scan → accept, with a thin accept/reject rule. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md) (standalone IOP — this repo does not edit that repo). Distilled series `20261103-1629` is the wavelength / fixture reference; the live comparison series uses **tap water** and is recorded under [`runs/tap_water_raman_20261113-214920/`](../../../runs/tap_water_raman_20261113-214920/REPORT.md). Tap-water artifacts stay in this repo’s `runs/`. The distilled calibration set stays in spectrometer-lab.
 
 [Tonic dilution / IFE](tonic_dilution.md) ([OBJ-2](../objectives.md#obj-2)) is the adaptive dilution ladder. This use-case is one chemistry and one accept/reject rule.
 
@@ -16,7 +16,7 @@ Series [`20261113-214920`](../../../runs/tap_water_raman_20261113-214920/REPORT.
 
 - Instrument: PerkinElmer LS 55 via spectrometer-lab IOP (HTTP preferred; CLI invoke temporary until `WaterRamanSOP` lands)
 - Physical attach (Pi bench): LS 55 RS-232 via **cede-gateway** Prolific USB–RS232 by-id (CEDE Phase 7)
-- Sample (first live SDL series): **tap water** in 4-window UV quartz cuvette; distilled remains the instrument-repo baseline
+- Sample (first live series): **tap water** in 4-window UV quartz cuvette; distilled remains the instrument-repo baseline
 - Blank: matched **freepath** (empty compartment, same Ex/slits/speed/step; Em covers 380–420)
 - Settings: Ex **350 nm**, Em **380–420 nm**, slits **10 nm**, **120 nm/min**, step **2 nm**, guide **397 nm**, SNR noise band **410–420 nm**
 - **Gate D** seating still open for factory-qualified claims; DIY fixture baselines are allowed (no hard `500:1` factory gate)
@@ -51,9 +51,9 @@ Normalized observations: `peak_nm`, `peak_delta_nm`, `snr`, `clipped`, `overload
 # uv run python examples/run_water_raman_campaign.py --mode http --interactive
 ```
 
-Until the SDL SOP lands, invoke spectrometer-lab CLI from a sibling checkout (`SPECTROMETER_LAB_ROOT`, unchanged scripts) and copy or summarize campaign artifacts into `runs/`; do not publish tap-water into the distilled calibration set. SDL adapters already speak HTTP for the Stage 3 path.
+Until the water-Raman SOP lands, invoke spectrometer-lab CLI from a sibling checkout (`SPECTROMETER_LAB_ROOT`, unchanged scripts) and copy or summarize campaign artifacts into `runs/`. Tap-water results stay in this repo’s `runs/`. Campaign adapters already speak HTTP for the Stage 3 path.
 
-## Mapping to SDL dossier
+## Mapping to campaign layers
 
 | Dossier key | Role here |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Architecture
 
-Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestration, decision, and Python logic; spectrometer-lab owns the LS 55 instrument IOP; **CEDE** owns continuous embedded development and the gateway physical attach plane.
+This repo owns campaign chemistry, SOPs, policy, and `runs/`. spectrometer-lab owns the LS 55 instrument IOP. **CEDE** owns continuous embedded development and the gateway physical attach plane. The same split in Rigaku tier language is [prior art](research.md).
 
 Scope, status, and permission: [project record](README.md). This page is the layer map. If it disagrees with the [charter](charter.md) on scope or permission, the charter wins.
 
@@ -38,14 +38,14 @@ Scope, status, and permission: [project record](README.md). This page is the lay
 | Layer | Owns | Does not own |
 | --- | --- | --- |
 | **self-driving-lab** | SOPs, policy, campaign chemistry (e.g. tap vs distilled), `runs/` provenance, HTTP adapters | Wire protocols, G-code, V4L capture, MCU flash; instrument-repo source edits |
-| **Instrument repos** | IOP, abort / idle-safe, acquisition, published instrument baselines | Campaign policy; gateway OS / by-id contracts; SDL store |
+| **Instrument repos** | IOP, abort / idle-safe, acquisition, published instrument baselines | Campaign policy; gateway OS / by-id contracts; the campaign store |
 | **CEDE** | Toolchains, flash/sync, by-id serial & UVC nodes, access groups (`dialout` / `video`) | Spectrometer protocol, Marlin G-code, campaign policy |
 
-**Reuse without merging:** spectrometer-lab (and later instrument repos) are **standalone black-box services**. SDL consumes their published contract — preferred: HTTP (`LS55HttpClient` → `:8055`); temporary until Stage 3 SOP/HTTP is live: invoke sibling-checkout CLIs via `SPECTROMETER_LAB_ROOT` the same way HIL does. Do **not** patch instrument repos from an SDL session, vendor `ls55` into this tree, or write campaign chemistry into instrument published calibration sets. Sample identity and accept/reject live in SDL campaign state / `runs/`.
+**Reuse without merging:** spectrometer-lab (and later instrument repos) are **standalone black-box services**. This repo consumes their published contract — preferred: HTTP (`LS55HttpClient` → `:8055`); temporary until Stage 3 SOP/HTTP is live: invoke sibling-checkout CLIs via `SPECTROMETER_LAB_ROOT` the same way HIL does. Do **not** patch instrument repos from a session in this repo, vendor `ls55` into this tree, or write campaign chemistry into instrument published calibration sets. Sample identity and accept/reject live in campaign state / `runs/`.
 
 **Evidence-gated loops.** Permission: [charter](charter.md#dual-loop-permission). Phase map: [`procedures/automated_academic_research.md`](procedures/automated_academic_research.md).
 
-**Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; [water Raman](procedures/water_raman.md), [OBJ-1](objectives.md#obj-1); [tonic dilution / IFE](procedures/tonic_dilution.md), [OBJ-2](objectives.md#obj-2)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](procedures/prep_area_dimensional.md), [OBJ-3](objectives.md#obj-3); ChArUco + Dev-Host vision — [bring-up](procedures/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco is SDL on the Dev-Host after capture.
+**Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; [water Raman](procedures/water_raman.md), [OBJ-1](objectives.md#obj-1); [tonic dilution / IFE](procedures/tonic_dilution.md), [OBJ-2](objectives.md#obj-2)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](procedures/prep_area_dimensional.md), [OBJ-3](objectives.md#obj-3); ChArUco + Dev-Host vision — [bring-up](procedures/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco metrology is campaign code on the Dev-Host after capture.
 
 **Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`procedures/lab_network_gateway.md`](procedures/lab_network_gateway.md). **Stretch:** [`tools/lab_status.py`](../../tools/lab_status.py) emits attach-vs-IOP JSON for the cohort; [crt-drive](https://github.com/fractalclockwork/crt-drive) VTTY (`APP=vtty`, `vtty_host_lab`) can show it on the Link MC5 — display only, not a campaign gate.
 
@@ -62,4 +62,4 @@ SOPs never parse RS-232. The adapter normalizes spectrometer-lab JSON into `Meas
 
 ## Safety
 
-Connect requires `gate_a_pass` and `compartment_closed`. Campaign shutdown calls shutter-off. Abort remains available on the instrument console / `/api/abort`. CEDE guarantees stable attach and OS access groups only; arming, idle-safe, and abort semantics stay on the IOP / SDL side.
+Connect requires `gate_a_pass` and `compartment_closed`. Campaign shutdown calls shutter-off. Abort remains available on the instrument console / `/api/abort`. CEDE guarantees stable attach and OS access groups only; arming, idle-safe, and abort semantics stay on the IOP / campaign side.

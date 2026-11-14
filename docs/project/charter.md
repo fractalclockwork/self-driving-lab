@@ -4,7 +4,9 @@ Purpose, scope, permission, and repo boundary for this lab. Status is the [score
 
 ## Purpose
 
-A reproducible academic campaign record a later student can read: the run directory, the accept/reject judgment, and a citation of the instrument method. An unattended self-driving lab is later work, outside the current baseline.
+A reproducible academic campaign a later researcher can re-read: `runs/<id>/`, the accept/reject judgment, and a citation of the instrument method.
+
+Automation covers proposal, gating, execution, and persistence wherever a fixture or an operator-acknowledged step can do it. Reconfiguration stays with the researcher: a new instrument is a new IOP plus an adapter, a new workflow is an SOP, and results stay in `runs/`. Unattended robotics stays [outside the current baseline](#outside-this-baseline).
 
 This repo owns campaign chemistry, SOPs, policy, and `runs/`. Instrument code stays in [spectrometer-lab](https://github.com/fractalclockwork/spectrometer-lab). Attach stays in [CEDE](https://github.com/fractalclockwork/cede).
 
@@ -27,12 +29,12 @@ A later reader can reconstruct what was asked, what ran, and why it was accepted
 - Accept rule for water Raman stays \|Δ\| ≤ 5 nm from 397 nm, finite RMS SNR, and no clip or overload. Settings stay Ex 350 nm, Em 380–420 nm, 10 nm slits.
 - Distilled series `20261103-1629` remains the wavelength reference.
 - Tap-water campaign artifacts stay under `runs/` in this repo. The distilled calibration set in spectrometer-lab stays the published baseline.
-- Sample identity is the SDL label. The IOP sidecar on the tap-water series still says distilled water; that string is an instrument-script constant.
+- Sample identity is the campaign label. The IOP sidecar on the tap-water series still says distilled water; that string is an instrument-script constant.
 - Fixture mode needs no Gate D seating and no live hardware. Gate D remains open for factory-qualified claims.
 - The operator is the sample-prep actuator through Stage 4.
 - Campaign store and image processing stay on the Dev-Host. The cede-gateway holds attach nodes and, at most, a temporary capture file.
 - HTTP `:8055` is the LS 55 contract. CLI invoke via `SPECTROMETER_LAB_ROOT` is a temporary path until the Stage 3 SOP is live.
-- Vendor notes are context. They are not adoption targets.
+- Prior art in [research.md](research.md) is context. Adoption decisions are the scope lists in this charter.
 
 ## Scope baseline
 
@@ -57,12 +59,12 @@ Recorded in the [backlog](backlog.md). Present in the tree or in a proposal, and
 ### Outside this baseline
 
 - Wire protocols, G-code, and V4L calls inside SOPs. SOPs call adapters.
-- MCU flash, CEDE discovery helpers, OTA, and Hello Lab Uno resolver wiring. SDL HIL stays separate from CEDE `hw-smoke`.
+- MCU flash, CEDE discovery helpers, OTA, and Hello Lab Uno resolver wiring. Cohort HIL in this repo stays separate from CEDE `hw-smoke`.
 - ChemOS, AlabOS, IvoryOS, ROS, SiLA 2, and OPC UA adoption.
 - Gate D hardware qualification.
 - Dockerizing the LS 55, containers per instrument, Grafana, and a lab-wide sensor bus.
 - An agent rewriting a live SOP.
-- Editing spectrometer-lab or CEDE from an SDL session, vendoring `ls55` into this tree, or writing campaign chemistry into an instrument published calibration set.
+- Editing spectrometer-lab or CEDE from a session in this repo, vendoring `ls55` into this tree, or writing campaign chemistry into an instrument published calibration set.
 
 [OBJ-5](objectives.md#obj-5) is the standing check that a change stays inside this baseline or edits this charter first.
 
