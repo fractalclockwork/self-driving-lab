@@ -30,15 +30,15 @@ Committed targets (print at **100% / actual size**):
 
 | File | Use |
 | --- | --- |
-| [`docs/calibration/prep_area_charuco_letter.pdf`](../calibration/prep_area_charuco_letter.pdf) | US Letter |
-| [`docs/calibration/prep_area_charuco_a4.pdf`](../calibration/prep_area_charuco_a4.pdf) | A4 |
-| [`docs/calibration/prep_area_charuco.json`](../calibration/prep_area_charuco.json) | Manifest (`sdl-prep-charuco-v1`) |
+| [`docs/project/calibration/prep_area_charuco_letter.pdf`](../calibration/prep_area_charuco_letter.pdf) | US Letter |
+| [`docs/project/calibration/prep_area_charuco_a4.pdf`](../calibration/prep_area_charuco_a4.pdf) | A4 |
+| [`docs/project/calibration/prep_area_charuco.json`](../calibration/prep_area_charuco.json) | Manifest (`sdl-prep-charuco-v1`) |
 
 Geometry: OpenCV `DICT_4X4_50`, **5×7** squares, square **24.0 mm**, marker **18.0 mm** (board **120×168 mm**), vector **100 mm** scale bar for a ruler check. Regenerate (Dev-Host only):
 
 ```bash
 uv sync --extra calibration
-uv run python tools/prep_area_charuco_card.py --out-dir docs/calibration
+uv run python tools/prep_area_charuco_card.py --out-dir docs/project/calibration
 ```
 
 ## Stage 0 checklist (operator)
@@ -51,10 +51,10 @@ uv run python tools/prep_area_charuco_card.py --out-dir docs/calibration
 
 ## Ladder next steps
 
-See [`instrument_bringup.md`](instrument_bringup.md) and [`prep_area_dimensional.md`](../use_cases/prep_area_dimensional.md). Stages 1–4 stay planning until motion/capture clients exist; vision policy and ChArUco detect remain Dev-Host SDL work.
+See [`instrument_bringup.md`](instrument_bringup.md) and [`prep_area_dimensional.md`](prep_area_dimensional.md). Stages 1–4 stay planning until motion/capture clients exist; vision policy and ChArUco detect remain Dev-Host SDL work.
 
 ## Related
 
 - HIL tool: [`instrument_hil_bringup.md`](instrument_hil_bringup.md)
 - Ladder: [`instrument_bringup.md`](instrument_bringup.md)
-- Use-case: [`prep_area_dimensional.md`](../use_cases/prep_area_dimensional.md)
+- Use-case: [`prep_area_dimensional.md`](prep_area_dimensional.md)

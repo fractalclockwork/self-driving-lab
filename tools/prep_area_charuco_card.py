@@ -24,8 +24,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--out-dir",
         type=Path,
-        default=_ROOT / "docs" / "calibration",
-        help="directory for PDFs + prep_area_charuco.json (default: docs/calibration)",
+        default=_ROOT / "docs" / "project" / "calibration",
+        help="directory for PDFs + prep_area_charuco.json (default: docs/project/calibration)",
     )
     args = p.parse_args(argv)
 

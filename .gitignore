@@ -16,7 +16,3 @@ htmlcov/
 .env
 .env.*
 !.env.example
-
-# Local / binary docs (keep markdown)
-docs/certificate_*.pdf
-docs/vendor/*.pdf

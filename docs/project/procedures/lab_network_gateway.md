@@ -139,7 +139,7 @@ Stage 0-style records gain, alongside USB by-id:
 
 Campaigns refuse **live** mode when required devices are not `healthy` (fixture / dry-run unchanged). Cohort HIL ([`instrument_hil_bringup.md`](instrument_hil_bringup.md)) already exercises layer 4 for the first bridge cohort; this proposal adds layers 1–3 and the aggregate gate as Stage 0 inventory requirements—PDU clients and campaign gates still unimplemented.
 
-**Stretch (display, not campaign gate):** [`tools/lab_status.py`](../../tools/lab_status.py) / `sdl.hil.status` is a Dev-Host read-mostly snapshot of layers 2–4 (gateway SSH, USB/V4L attach, LS 55 identity / Marlin `M115`). It distinguishes LS 55 **ADAPTER** (by-id present, no IOP reply — e.g. instrument powered off) from Marlin **CTRL OK** (Mega answers `M115` even when gantry mains are off; pass `--note` for mains until PDUs exist). [crt-drive](https://github.com/fractalclockwork/crt-drive) `vtty_host_lab` paints a phosphor dashboard (LEDs / clock / rules); local Pico via `make vtty-start HOST=vtty_host_lab`, Pico on cede-pi via `tools/vtty_lab_gateway.sh`. Not layer 1 / not `powered_off` aggregate.
+**Stretch (display, not campaign gate):** [`tools/lab_status.py`](../../../tools/lab_status.py) / `sdl.hil.status` is a Dev-Host read-mostly snapshot of layers 2–4 (gateway SSH, USB/V4L attach, LS 55 identity / Marlin `M115`). It distinguishes LS 55 **ADAPTER** (by-id present, no IOP reply — e.g. instrument powered off) from Marlin **CTRL OK** (Mega answers `M115` even when gantry mains are off; pass `--note` for mains until PDUs exist). [crt-drive](https://github.com/fractalclockwork/crt-drive) `vtty_host_lab` paints a phosphor dashboard (LEDs / clock / rules); local Pico via `make vtty-start HOST=vtty_host_lab`, Pico on cede-pi via `tools/vtty_lab_gateway.sh`. Not layer 1 / not `powered_off` aggregate.
 
 ## SDL implications
 
@@ -168,12 +168,12 @@ Campaigns refuse **live** mode when required devices are not `healthy` (fixture 
 
 ## Related docs
 
-- Architecture: [`docs/architecture.md`](../architecture.md)
+- Architecture: [`docs/project/architecture.md`](../architecture.md)
 - Instrument bringup ladder: [`instrument_bringup.md`](instrument_bringup.md)
 - Stage 0 HIL (LS 55 + Marlin + C310): [`instrument_hil_bringup.md`](instrument_hil_bringup.md)
-- Lab status CLI (layers 2–4 display): [`tools/lab_status.py`](../../tools/lab_status.py)
+- Lab status CLI (layers 2–4 display): [`tools/lab_status.py`](../../../tools/lab_status.py)
 - CRT VTTY lab page: [crt-drive `vtty_host_lab.py`](https://github.com/fractalclockwork/crt-drive/blob/main/tools/vtty_host_lab.py)
 - Marlin + C310: [`marlin_c310_bringup.md`](marlin_c310_bringup.md)
-- Continuous instrument peers: [`docs/vendor/continuous_instrument_development.md`](../vendor/continuous_instrument_development.md)
+- Continuous instrument peers: [`docs/project/research.md`](../research.md)
 - CEDE: [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [lab.example.yaml](https://github.com/fractalclockwork/cede/blob/main/config/lab.example.yaml)
 - E-Lab exemplar: [E-Lab-SFSU](https://github.com/E-Lab-SFSU), [RoboCam 3.1 docs](https://e-lab-sfsu.github.io/RoboCam3.1/)

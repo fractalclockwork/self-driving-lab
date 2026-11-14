@@ -1,8 +1,10 @@
 # Use-case: Prep-area imaging / dimensional metrology
 
+Objective: [OBJ-3](../objectives.md#obj-3). Ladder position: [project status](../README.md).
+
 First **Marlin gantry + Logitech C310** science loop: image the sample-preparation area and recover **dimensional measurements** (mm) using the committed **ChArUco** calibration card (`sdl-prep-charuco-v1`).
 
-Planning / design only until Stage 2–3 clients exist — see [instrument bringup](../roadmap/instrument_bringup.md) and [Marlin + C310 bring-up](../roadmap/marlin_c310_bringup.md).
+Bring-up procedure: [instrument ladder](instrument_bringup.md), [Marlin + C310](marlin_c310_bringup.md).
 
 ## Science / engineering question
 
@@ -12,7 +14,7 @@ From a named gantry pose over the prep area, can the C310 recover metric scale f
 
 - **Motion:** Marlin on Arduino Mega — home, move XYZ, report pose (IOP external when present; G-code stays out of SDL SOPs)
 - **Vision capture:** Logitech C310 UVC on **cede-gateway** (`046d:081b`; `/dev/video0` or `/dev/v4l/by-id/*`); gateway holds only a temporary capture file
-- **Calibration target:** [`docs/calibration/`](../calibration/) ChArUco PDFs — `DICT_4X4_50`, 5×7, square 24.0 mm, marker 18.0 mm; ruler-check the 100 mm bar
+- **Calibration target:** [`docs/project/calibration/`](../calibration/) ChArUco PDFs — `DICT_4X4_50`, 5×7, square 24.0 mm, marker 18.0 mm; ruler-check the 100 mm bar
 - **Physical attach:** CEDE Phase 7 first cohort (Mega CDC by-id + C310); open gateway nodes, not Dev-Host USB by default
 - **Metrology:** ChArUco detect / scale / mm lengths run on the **Dev-Host** (SDL), after the frame is copied into `runs/`. Not a spectrometer-style HTTP vision IOP
 
@@ -61,6 +63,6 @@ Artifacts (target): Dev-Host `runs/<campaign_id>/` with state, events, and linke
 | `orchestration` | `CampaignRunner` + operator-gated waypoint SOP |
 | `physical_control_plane` | CEDE cede-gateway attach for Mega + C310 (attach host, not campaign host) |
 | `data_backbone` | Dev-Host `runs/` only |
-| `robotics_handling` | Stage 5 later — unattended prep; this use-case stays Stage 3–4 first |
+| `robotics_handling` | Unattended prep is [outside the current baseline](../charter.md#outside-this-baseline). This loop is [OBJ-3](../objectives.md#obj-3). |
 
 This is a **vision metrology** loop (calibrate → measure → accept), not fluorescence. Spectrometer HTTP IOP shape remains for LS 55 / modern spectrometers; prep-area vision stays local on the Dev-Host after capture.

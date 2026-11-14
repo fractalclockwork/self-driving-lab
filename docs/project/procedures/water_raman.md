@@ -1,12 +1,16 @@
 # Use-case: Water Raman (LS 55 bringup)
 
-Simpler **first LS 55** SDL loop: water O–H Raman band as wavelength / SNR bringup. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md) (standalone IOP — SDL does not edit that repo). Distilled series `20261103-1629` is the wavelength / fixture reference; the first live SDL comparison series uses **tap water** and is recorded under [`runs/tap_water_raman_20261113-214920/`](../../runs/tap_water_raman_20261113-214920/REPORT.md) (not in spectrometer-lab `data/published/water-raman/`). That series **stopped at sanity** (no local max within 5 nm of 397 nm; continuum-dominated).
+Objective: [OBJ-1](../objectives.md#obj-1). Ladder position: [project status](../README.md).
 
-[Tonic dilution / IFE](tonic_dilution.md) is a **later Stage 4** project (adaptive dilution ladder). This use-case targets **Stage 3** (operator-gated connect → setup → scan → accept) with a thin accept/reject rule — not a multi-dilution policy.
+Water O–H Raman band as the wavelength / SNR loop: operator-gated connect → setup → scan → accept, with a thin accept/reject rule. Method locked in spectrometer-lab [`docs/experiments/water-raman.md`](https://github.com/fractalclockwork/spectrometer-lab/blob/main/docs/experiments/water-raman.md) (standalone IOP — SDL does not edit that repo). Distilled series `20261103-1629` is the wavelength / fixture reference; the live SDL comparison series uses **tap water** and is recorded under [`runs/tap_water_raman_20261113-214920/`](../../../runs/tap_water_raman_20261113-214920/REPORT.md). Tap-water artifacts stay in this repo’s `runs/`. The distilled calibration set stays in spectrometer-lab.
+
+[Tonic dilution / IFE](tonic_dilution.md) ([OBJ-2](../objectives.md#obj-2)) is the adaptive dilution ladder. This use-case is one chemistry and one accept/reject rule.
 
 ## Science / engineering question
 
 With Ex **350 nm** and Em **380–420 nm** (`10 nm` slits), does blank-subtracted water show a local max near the **397 nm** guide (|Δ| ≤ 5 nm) with finite RMS SNR and no clip/overload — enough to trust lamp, monochromators, and PMT on this fixture? Tap vs distilled intensity/SNR differences are chemistry comparison, not a seating or calibration update.
+
+Series [`20261113-214920`](../../../runs/tap_water_raman_20261113-214920/REPORT.md) took a matched freepath blank and one tap-water sanity scan, then stopped (annotated peak 390 nm, |Δ| = 7 nm, continuum-dominated). That result is evidence. The accept rule below is unchanged. Whether the stage is open is the [scoreboard](../README.md).
 
 ## Hardware / chemistry
 
@@ -62,4 +66,4 @@ Until the SDL SOP lands, invoke spectrometer-lab CLI from a sibling checkout (`S
 
 ## Relation to tonic dilution
 
-Water Raman proves the optical path and SDL Stage 3 pattern with one chemistry and no adaptive dilution. [Tonic dilution / IFE](tonic_dilution.md) reuses the same adapter and adds dilution proposals, IFE stop logic, and denser operator prep — schedule it **after** this bringup loop is real.
+Water Raman is the optical-path loop with one chemistry. [Tonic dilution / IFE](tonic_dilution.md) ([OBJ-2](../objectives.md#obj-2)) reuses the same adapter and adds dilution proposals, IFE stop logic, and denser operator prep.

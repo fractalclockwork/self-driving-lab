@@ -1,8 +1,8 @@
 # Use-case: Tonic dilution / IFE onset
 
-Closed-loop version of spectrometer-lab **Experiment 1** (tonic-water emission spectrum & dilution series).
+Objective: [OBJ-2](../objectives.md#obj-2). It follows [OBJ-1](../objectives.md#obj-1) on the [project status](../README.md).
 
-**Later-stage LS 55 project:** prefer [water Raman bringup](water_raman.md) as the first SDL↔LS 55 loop (Stage 3). This use-case is **Stage 4** — adaptive dilution / IFE — after water-Raman SOP and accept criteria are in place. Existing `TonicDilutionSOP` / fixture CI remain as the advanced reference implementation.
+Closed-loop version of spectrometer-lab **Experiment 1** (tonic-water emission spectrum and dilution series): adaptive dilution / IFE. [Water Raman](water_raman.md) is the first LS 55 loop. `TonicDilutionSOP` and fixture CI remain the reference implementation in this repo.
 
 ## Science question
 
@@ -30,7 +30,7 @@ Where does blank-subtracted fluorescence intensity deviate from linear concentra
 
 ## Operator role
 
-Until Stage 5 robotics (see [instrument bringup roadmap](../roadmap/instrument_bringup.md)), the human is the sample-prep actuator:
+Until Stage 5 robotics (see [instrument bringup roadmap](instrument_bringup.md)), the human is the sample-prep actuator:
 
 1. Prepare the requested dilution (`1:N` tonic-to-total).
 2. Load cuvette, close compartment.

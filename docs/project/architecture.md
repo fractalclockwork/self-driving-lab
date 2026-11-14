@@ -2,13 +2,15 @@
 
 Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestration, decision, and Python logic; spectrometer-lab owns the LS 55 instrument IOP; **CEDE** owns continuous embedded development and the gateway physical attach plane.
 
+Scope, status, and permission: [project record](README.md). This page is the layer map. If it disagrees with the [charter](charter.md) on scope or permission, the charter wins.
+
 ## Layers
 
 ```
 +-----------------------------------------------------------------+
 | Data Backbone — runs/<id>/state.json + events.jsonl + catalog   |
 +-----------------------------------------------------------------+
-| Orchestration — CampaignRunner (+ WaterRamanSOP next; tonic later) |
+| Orchestration — CampaignRunner (SOP per the project objectives) |
 +-----------------------------------------------------------------+
 | Integration — LS55HttpClient / FixtureLS55Client                |
 +----------+-----------------+---------------+----------+---------+
@@ -24,12 +26,12 @@ Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestr
 | --- | --- |
 | `integration` | `sdl.integration.ls55_client` — HTTP to `/api/connect|setup|single-read|scan|review/recompute|state|abort|shutter/off` |
 | `analytical_metrology` | spectrometer-lab `LS55Service` (scout `$RD`, scan `$SC`, review peak/SNR/clip) |
-| `physical_control_plane` | **[CEDE](https://github.com/fractalclockwork/cede)** Dev-Host + cede-gateway — toolchains, flash/sync, stable USB/serial/V4L attach, discovery; DS-7 lifecycle `build` / `deploy` / `validate` / `debug`. See CEDE [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [DS-7 / DS-17](https://github.com/fractalclockwork/cede/blob/main/docs/DESIGN_SPECIFICATION.md), and peer landscape [`docs/vendor/continuous_instrument_development.md`](vendor/continuous_instrument_development.md). **Lab LAN (proposal):** OpenWRT = L2/L3 instrument network; cede-gateway = non-IP attach; IP PDUs + Dev-Host health rollup = gated ops plane — [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md). |
-| `sample_prep` | OperatorGate prompts (“dilute N× and load”); no liquid handler in v1 |
+| `physical_control_plane` | **[CEDE](https://github.com/fractalclockwork/cede)** Dev-Host + cede-gateway — toolchains, flash/sync, stable USB/serial/V4L attach, discovery; DS-7 lifecycle `build` / `deploy` / `validate` / `debug`. See CEDE [DEV_OP Phase 7](https://github.com/fractalclockwork/cede/blob/main/docs/DEV_OP.md), [DS-7 / DS-17](https://github.com/fractalclockwork/cede/blob/main/docs/DESIGN_SPECIFICATION.md), and peer landscape [`research.md`](research.md). **Lab LAN (proposal):** OpenWRT = L2/L3 instrument network; cede-gateway = non-IP attach; IP PDUs + Dev-Host health rollup = gated ops plane — [`procedures/lab_network_gateway.md`](procedures/lab_network_gateway.md). |
+| `sample_prep` | OperatorGate prompts (“dilute N× and load”). Liquid handling is [outside the current baseline](charter.md#outside-this-baseline). |
 | `ai_ml_decision` | `DecisionEngine` protocol; `ClipSNRDilutionPolicy` rules; BayBE can implement the same protocol later |
 | `orchestration` | `CampaignRunner` loop: propose → gate → execute → persist |
 | `data_backbone` | `CampaignStore` filesystem provenance |
-| `robotics_handling` / `synthesis_prep` | Deferred (**Stage 5** / out of scope); see [`docs/roadmap/instrument_bringup.md`](roadmap/instrument_bringup.md) |
+| `robotics_handling` / `synthesis_prep` | Stage 5, [outside the current baseline](charter.md#outside-this-baseline) |
 
 ### Boundary
 
@@ -41,9 +43,11 @@ Level-4 custom control (dossier / Rigaku tier language): this repo owns orchestr
 
 **Reuse without merging:** spectrometer-lab (and later instrument repos) are **standalone black-box services**. SDL consumes their published contract — preferred: HTTP (`LS55HttpClient` → `:8055`); temporary until Stage 3 SOP/HTTP is live: invoke sibling-checkout CLIs via `SPECTROMETER_LAB_ROOT` the same way HIL does. Do **not** patch instrument repos from an SDL session, vendor `ls55` into this tree, or write campaign chemistry into instrument published calibration sets. Sample identity and accept/reject live in SDL campaign state / `runs/`.
 
-**Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; bringup [water Raman](use_cases/water_raman.md), later [tonic dilution / IFE](use_cases/tonic_dilution.md)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](use_cases/prep_area_dimensional.md); ChArUco + Dev-Host vision — [bring-up](roadmap/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco is SDL on the Dev-Host after capture.
+**Evidence-gated loops.** Permission: [charter](charter.md#dual-loop-permission). Phase map: [`procedures/automated_academic_research.md`](procedures/automated_academic_research.md).
 
-**Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`roadmap/lab_network_gateway.md`](roadmap/lab_network_gateway.md). **Stretch:** [`tools/lab_status.py`](../tools/lab_status.py) emits attach-vs-IOP JSON for the cohort; [crt-drive](https://github.com/fractalclockwork/crt-drive) VTTY (`APP=vtty`, `vtty_host_lab`) can show it on the Link MC5 — display only, not a campaign gate.
+**Live path (spectrometer):** adapter → IOP service → **cede-gateway device node** (not Dev-Host USB by default). **Data plane:** campaign store and all image processing stay on the **Dev-Host** (`runs/`); the gateway may hold only a temporary capture file. First bridge cohort: **LS 55** (Prolific USB–RS232; [water Raman](procedures/water_raman.md), [OBJ-1](objectives.md#obj-1); [tonic dilution / IFE](procedures/tonic_dilution.md), [OBJ-2](objectives.md#obj-2)) and **Marlin gantry + Logitech C310** (Mega CDC + UVC; [prep-area dimensional](procedures/prep_area_dimensional.md), [OBJ-3](objectives.md#obj-3); ChArUco + Dev-Host vision — [bring-up](procedures/marlin_c310_bringup.md)). Spectrometer-style HTTP IOP is for spectrometers; prep-area ChArUco is SDL on the Dev-Host after capture.
+
+**Lab network (proposal):** a future OpenWRT **lab network gateway** unifies Ethernet/WiFi instruments and IP smart PDUs on one LAN; **cede-gateway(s)** remain the USB/serial/GPIO/UVC attach plane. Dev-Host owns health aggregation and operator-armed outlet actions. Requirements and topology: [`procedures/lab_network_gateway.md`](procedures/lab_network_gateway.md). **Stretch:** [`tools/lab_status.py`](../../tools/lab_status.py) emits attach-vs-IOP JSON for the cohort; [crt-drive](https://github.com/fractalclockwork/crt-drive) VTTY (`APP=vtty`, `vtty_host_lab`) can show it on the Link MC5 — display only, not a campaign gate.
 
 ## Loop
 

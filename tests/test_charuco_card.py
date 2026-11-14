@@ -22,7 +22,7 @@ from sdl.calibration.charuco_card import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CAL_DIR = REPO_ROOT / "docs" / "calibration"
+CAL_DIR = REPO_ROOT / "docs" / "project" / "calibration"
 MANIFEST = CAL_DIR / "prep_area_charuco.json"
 LETTER_PDF = CAL_DIR / "prep_area_charuco_letter.pdf"
 A4_PDF = CAL_DIR / "prep_area_charuco_a4.pdf"
